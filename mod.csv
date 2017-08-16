@@ -1,0 +1,15 @@
+
+menufile,ui_mp/scriptmenus/minesweeper.menu
+menufile,ui_mp/scriptmenus/clientcmd.menu
+
+material,minesweeper_square
+material,minesweeper_board
+material,minesweeper_glasses
+material,minesweeper_smile
+material,minesweeper_dead
+material,minesweeper_flag
+material,minesweeper_mine
+material,minesweeper_minered
+
+rawfile,maps/mp/minesweeper.gsc
+rawfile,maps/mp/gametypes/_rank.gsc

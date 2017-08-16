@@ -1,0 +1,2 @@
+cd ..\..\
+cod4x18_dedrun.exe +exec server.cfg +set fs_game "Mods/minesweeper_dev" +set sv_maxclients 12 +set dedicated 2 +set net_ip 127.0.0.2 +set developer 2 +set scr_testclients 64 +set sv_cheats 1 +map mp_crash
