@@ -48,7 +48,7 @@ SetClientDvars()
 
 		}
 		//wait to avoid sending too many clientdvars at once
-		wait 0.05;
+		wait 0.1;
 	}	
 }
 
@@ -114,7 +114,8 @@ gameLoop()
 		if(token[0] == "close")
 		{
 			//add delay cause opening a closing menu can cause game to crash
-			wait 1.5;
+			wait 1;
+			self.mineSweeperOpen = false;
 			self CloseMenu();
 			self notify("minesweep_gameover");
 		}
@@ -147,7 +148,7 @@ gameLoop()
 				if(self.numOfClicks == 0)
 					self thread main();
 				self SetClientDvar("hideminebutton"+x+"_"+y, "false");
-				self revealBoard(x, y);
+				self revealBoard(int(x), int(y));
 				self SetClientDvar("minesweeper_face", "minesweeper_dead");
 				self watchRestart();
 			}
@@ -252,7 +253,7 @@ revealBoard(xpos, ypos)
 		{
 			if(self.type[x][y] == "mine")
 			{
-				if(x == int(xpos) && y == int(xpos))
+				if(x == xpos && y == ypos)
 					self SetClientDvar("minesweeper_cellshader"+x+"_"+y, "minesweeper_minered");
 				else
 					self SetClientDvar("minesweeper_cellshader"+x+"_"+y, "minesweeper_mine");
@@ -308,85 +309,32 @@ updateScore()
 	self SetClientDvar("minesweeper_stats", current+"\n \n \n"+pb);
 }
 
+
 //Open up surround mines when clicking a blank square
 openSurroundingMines(x,y)
 {
 	self endon("minesweep_gameover");
 	self endon("disconnect");
 
-	//no wait mean stack overflow error :/
+	oldX = x;
+	oldY = y;
 	wait 0.05;
-	//sides
-	x++;
-	//Check we are inside board, cell isnt mine and cell is hidden
-	if( x > -1 && x < 9 && y < 9 && y > -1 && self.type[x][y] != "mine" && !self.hidden[int(x)][int(y)])
+	for (i = -1; i<2; i++)
 	{
-		//open cell
-		self SetClientDvar("hideminebutton"+x+"_"+y, "true");
-		self.hidden[int(x)][int(y)] = true;
-		if(self.type[x][y] == "0")
-			thread openSurroundingMines(x,y);
+	    x = i + oldX;
+	    for (j = -1; j<2; j++)
+	    {
+	        y = j + oldY;
+	        if( x > -1 && x < 9 && y < 9 && y > -1 && self.type[x][y] != "mine" && !self.hidden[int(x)][int(y)])
+			{
+				//open cell
+				self SetClientDvar("hideminebutton"+x+"_"+y, "true");
+				self.hidden[int(x)][int(y)] = true;
+				if(self.type[x][y] == "0")
+					thread openSurroundingMines(x,y);
+			}
+	    }
 	}
-	x--;
-	y++;
-	if( x > -1 && x < 9 && y < 9 && y > -1 && self.type[x][y] != "mine"  && !self.hidden[int(x)][int(y)])
-	{
-		self SetClientDvar("hideminebutton"+x+"_"+y, "true");
-		self.hidden[int(x)][int(y)] = true;
-		if(self.type[x][y] == "0")
-			thread openSurroundingMines(x,y);
-	}
-	y--;
-	x--;
-	if( x > -1 && x < 9 && y < 9 && y > -1 && self.type[x][y] != "mine"  && !self.hidden[int(x)][int(y)])
-	{
-		self SetClientDvar("hideminebutton"+x+"_"+y, "true");
-		self.hidden[int(x)][int(y)] = true;
-		if(self.type[x][y] == "0")
-			thread openSurroundingMines(x,y);
-	}
-	x++;
-	y--;
-	if( x > -1 && x < 9 && y < 9 && y > -1 && self.type[x][y] != "mine"  && !self.hidden[int(x)][int(y)])
-	{
-		self SetClientDvar("hideminebutton"+x+"_"+y, "true");
-		self.hidden[int(x)][int(y)] = true;
-		if(self.type[x][y] == "0")
-			thread openSurroundingMines(x,y);
-	}
-	//corners
-	x++;
-	if( x > -1 && x < 9 && y < 9 && y > -1 && self.type[x][y] != "mine"  && !self.hidden[int(x)][int(y)])
-	{
-		self SetClientDvar("hideminebutton"+x+"_"+y, "true");
-		self.hidden[int(x)][int(y)] = true;
-		if(self.type[x][y] == "0")
-			thread openSurroundingMines(x,y);
-	}
-	x -= 2;
-	if( x > -1 && x < 9 && y < 9 && y > -1 && self.type[x][y] != "mine"  && !self.hidden[int(x)][int(y)])
-	{
-		self SetClientDvar("hideminebutton"+x+"_"+y, "true");
-		self.hidden[int(x)][int(y)] = true;
-		if(self.type[x][y] == "0")
-			thread openSurroundingMines(x,y);
-	}
-	y += 2;
-	if( x > -1 && x < 9 && y < 9 && y > -1 && self.type[x][y] != "mine"  && !self.hidden[int(x)][int(y)])
-	{
-		self SetClientDvar("hideminebutton"+x+"_"+y, "true");
-		self.hidden[int(x)][int(y)] = true;
-		if(self.type[x][y] == "0")
-			thread openSurroundingMines(x,y);
-	}
-	x += 2;
-	if( x > -1 && x < 9 && y < 9 && y > -1 && self.type[x][y] != "mine"  && !self.hidden[int(x)][int(y)])
-	{
-		self SetClientDvar("hideminebutton"+x+"_"+y, "true");
-		self.hidden[int(x)][int(y)] = true;
-		if(self.type[x][y] == "0")
-			thread openSurroundingMines(x,y);
-	}	
 }
 
 //get mines surrounding a single mine
@@ -394,39 +342,19 @@ getSurroundingMines(x,y)
 {
 	surroundingMines = 0;
 
-	x++;
-	if(x <= 8 && x >= 0 && y <=8 && y >= 0)
-		if(self.type[x][y] == "mine")
-			surroundingMines++;
-	y++;
-	if(x <= 8 && x >= 0 && y <=8 && y >= 0)
-		if(self.type[x][y] == "mine")
-			surroundingMines++;	
-	x--;
-	if(x <= 8 && x >= 0 && y <=8 && y >= 0)
-		if(self.type[x][y] == "mine")
-			surroundingMines++;
-	x--;
-	if(x <= 8 && x >= 0 && y <=8 && y >= 0)
-		if(self.type[x][y] == "mine")
-			surroundingMines++;
-	y--;
-	if(x <= 8 && x >= 0 && y <=8 && y >= 0)
-		if(self.type[x][y] == "mine")
-			surroundingMines++;
-	y--;
-	if(x <= 8 && x >= 0 && y <=8 && y >= 0)
-		if(self.type[x][y] == "mine")
-			surroundingMines++;
-	x++;
-	if(x <= 8 && x >= 0 && y <=8 && y >= 0)
-		if(self.type[x][y] == "mine")
-			surroundingMines++;
-	x++;
-	if(x <= 8 && x >= 0 && y <=8 && y >= 0)
-		if(self.type[x][y] == "mine")
-			surroundingMines++;
-
+	oldX = x;
+	oldY = y;
+	for (i = -1; i<2; i++)
+	{
+	    x = i + oldX;
+	    for (j = -1; j<2; j++)
+	    {
+	        y = j + oldY;
+	        if(x <= 8 && x >= 0 && y <=8 && y >= 0)
+				if(self.type[x][y] == "mine")
+					surroundingMines++;
+	    }
+	}
 	return surroundingMines;
 }
 
