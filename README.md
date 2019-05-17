@@ -11,3 +11,5 @@ Restart the game by pressing the Face or pressing F2
 To exit MineSweeper menu press ESC, there is a 1.5 seconds delay
 
 Mod should work on multiplayer although I havnt done any extensive testing so there may be some bugs :P
+
+video: https://www.youtube.com/watch?v=W9_Ry73IH4o
